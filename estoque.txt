@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeStock - Controle de Estoque para Cafeteria</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6F4E37;
+            --secondary-color: #C9A769;
+            --accent-color: #5D4037;
+            --light-color: #F5F1EA;
+            --dark-color: #3E2723;
+            --success-color: #4CAF50;
+            --warning-color: #FF9800;
+            --danger-color: #F44336;
+            --gray-light: #ECEFF1;
+            --gray: #90A4AE;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9f9f9;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-icon {
+            font-size: 28px;
+            margin-right: 12px;
+            color: var(--secondary-color);
+        }
+
+        .logo h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item i {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item span {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 24px;
+            color: white;
+        }
+
+        .stat-info h3 {
+            font-size: 14px;
+            color: var(--gray);
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .stat-info .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        /* Content Sections */
+        .content-section {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-header h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            border: none;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        thead {
+            background-color: var(--light-color);
+        }
+
+        th {
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark-color);
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        tr:hover {
+            background-color: rgba(201, 167, 105, 0.05);
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-in-stock {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-low-stock {
+            background-color: rgba(255, 152, 0, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-out-of-stock {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--danger-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            color: white;
+            font-size: 14px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius);
+            font-family: 'Roboto', sans-serif;
+            font-size: 15px;
+            transition: border 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: white;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 24px 30px;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--dark-color);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 20px;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .logo {
+                margin-bottom: 0;
+                padding-bottom: 0;
+                border-bottom: none;
+            }
+            
+            .nav-menu {
+                display: flex;
+                flex-grow: 0;
+            }
+            
+            .nav-item {
+                margin-bottom: 0;
+                margin-left: 10px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .nav-menu {
+                width: 100%;
+                flex-direction: column;
+                margin-top: 20px;
+            }
+            
+            .nav-item {
+                margin-left: 0;
+                margin-bottom: 8px;
+                width: 100%;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-coffee logo-icon"></i>
+                <h1>CoffeeStock</h1>
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" data-section="inventory">
+                    <i class="fas fa-boxes"></i>
+                    <span>Estoque</span>
+                </div>
+                <div class="nav-item" data-section="add-item">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Adicionar Item</span>
+                </div>
+                <div class="nav-item" data-section="remove-item">
+                    <i class="fas fa-minus-circle"></i>
+                    <span>Retirar Item</span>
+                </div>
+                <div class="nav-item" data-section="reports">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Relatórios</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active-section">
+                <div class="header">
+                    <h2>Dashboard do Estoque</h2>
+                    <div class="current-date">
+                        <i class="far fa-calendar-alt"></i>
+                        <span id="current-date"></span>
+                    </div>
+                </div>
+                
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: var(--primary-color);">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total de Itens</h3>
+                            <div class="value" id="total-items">0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: var(--success-color);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Em Estoque</h3>
+                            <div class="value" id="in-stock-items">0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: var(--warning-color);">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Estoque Baixo</h3>
+                            <div class="value" id="low-stock-items">0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: var(--danger-color);">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Sem Estoque</h3>
+                            <div class="value" id="out-of-stock-items">0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section-header">
+                    <h3>Itens com Estoque Baixo</h3>
+                </div>
+                
+                <div class="table-container">
+                    <table id="low-stock-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Categoria</th>
+                                <th>Quantidade</th>
+                                <th>Mínimo</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="low-stock-items-body">
+                            <!-- Itens com estoque baixo serão inseridos aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Inventory Section -->
+            <section id="inventory" class="content-section">
+                <div class="section-header">
+                    <h3>Controle de Estoque</h3>
+                    <button class="btn btn-primary" id="add-item-btn">
+                        <i class="fas fa-plus"></i> Adicionar Item
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Categoria</th>
+                                <th>Quantidade</th>
+                                <th>Mínimo</th>
+                                <th>Fornecedor</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-items-body">
+                            <!-- Itens do estoque serão inseridos aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Add Item Section -->
+            <section id="add-item" class="content-section">
+                <div class="section-header">
+                    <h3>Adicionar Item ao Estoque</h3>
+                </div>
+                
+                <form id="add-item-form">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="item-name">Nome do Item *</label>
+                                <input type="text" id="item-name" placeholder="Ex: Café Arábica, Açúcar, Copos Descartáveis" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="item-category">Categoria *</label>
+                                <select id="item-category" required>
+                                    <option value="">Selecione uma categoria</option>
+                                    <option value="grãos">Grãos de Café</option>
+                                    <option value="bebidas">Bebidas</option>
+                                    <option value="laticínios">Laticínios</option>
+                                    <option value="doces">Doces e Sobremesas</option>
+                                    <option value="embalagens">Embalagens</option>
+                                    <option value="outros">Outros</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="item-quantity">Quantidade *</label>
+                                <input type="number" id="item-quantity" min="0" step="1" placeholder="Quantidade em estoque" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="item-minimum">Quantidade Mínima *</label>
+                                <input type="number" id="item-minimum" min="0" step="1" placeholder="Estoque mínimo desejado" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="item-supplier">Fornecedor</label>
+                                <input type="text" id="item-supplier" placeholder="Nome do fornecedor">
+                            </div>
+                        </div>
+                        
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="item-unit">Unidade de Medida *</label>
+                                <select id="item-unit" required>
+                                    <option value="">Selecione a unidade</option>
+                                    <option value="kg">Quilograma (kg)</option>
+                                    <option value="g">Grama (g)</option>
+                                    <option value="litro">Litro (L)</option>
+                                    <option value="ml">Mililitro (ml)</option>
+                                    <option value="unidade">Unidade</option>
+                                    <option value="pacote">Pacote</option>
+                                    <option value="caixa">Caixa</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="item-notes">Observações</label>
+                        <input type="text" id="item-notes" placeholder="Informações adicionais sobre o item">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn" id="cancel-add-btn">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Salvar Item
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Remove Item Section -->
+            <section id="remove-item" class="content-section">
+                <div class="section-header">
+                    <h3>Retirar Item do Estoque</h3>
+                </div>
+                
+                <div class="form-group">
+                    <label for="search-item">Buscar Item para Retirada</label>
+                    <input type="text" id="search-item" placeholder="Digite o nome do item...">
+                </div>
+                
+                <div class="table-container">
+                    <table id="remove-item-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Categoria</th>
+                                <th>Disponível</th>
+                                <th>Quantidade a Retirar</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="remove-items-body">
+                            <!-- Itens para retirada serão inseridos aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="content-section">
+                <div class="section-header">
+                    <h3>Relatórios de Estoque</h3>
+                    <button class="btn btn-primary" id="generate-report-btn">
+                        <i class="fas fa-download"></i> Gerar Relatório
+                    </button>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="report-type">Tipo de Relatório</label>
+                            <select id="report-type">
+                                <option value="all">Estoque Completo</option>
+                                <option value="low">Itens com Estoque Baixo</option>
+                                <option value="out">Itens sem Estoque</option>
+                                <option value="category">Por Categoria</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="report-category">Categoria (se aplicável)</label>
+                            <select id="report-category">
+                                <option value="all">Todas as Categorias</option>
+                                <option value="grãos">Grãos de Café</option>
+                                <option value="bebidas">Bebidas</option>
+                                <option value="laticínios">Laticínios</option>
+                                <option value="doces">Doces e Sobremesas</option>
+                                <option value="embalagens">Embalagens</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="report-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Categoria</th>
+                                <th>Quantidade</th>
+                                <th>Mínimo</th>
+                                <th>Status</th>
+                                <th>Última Atualização</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-items-body">
+                            <!-- Dados do relatório serão inseridos aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Modal para edição de item -->
+    <div class="modal-overlay" id="edit-item-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Editar Item</h3>
+                <button class="close-modal" id="close-edit-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-item-form">
+                    <input type="hidden" id="edit-item-id">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="edit-item-name">Nome do Item</label>
+                                <input type="text" id="edit-item-name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="edit-item-category">Categoria</label>
+                                <select id="edit-item-category" required>
+                                    <option value="grãos">Grãos de Café</option>
+                                    <option value="bebidas">Bebidas</option>
+                                    <option value="laticínios">Laticínios</option>
+                                    <option value="doces">Doces e Sobremesas</option>
+                                    <option value="embalagens">Embalagens</option>
+                                    <option value="outros">Outros</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="edit-item-quantity">Quantidade</label>
+                                <input type="number" id="edit-item-quantity" min="0" step="1" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="edit-item-minimum">Quantidade Mínima</label>
+                                <input type="number" id="edit-item-minimum" min="0" step="1" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn" id="cancel-edit-btn">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados de exemplo para o estoque
+        let inventory = [
+            { id: 1, name: "Café Arábica", category: "grãos", quantity: 15, minQuantity: 10, supplier: "Café do Brasil", unit: "kg", notes: "Grãos premium", lastUpdated: "2023-10-15" },
+            { id: 2, name: "Açúcar Refinado", category: "doces", quantity: 8, minQuantity: 5, supplier: "Doce Sabor", unit: "kg", notes: "Pacote de 1kg", lastUpdated: "2023-10-18" },
+            { id: 3, name: "Leite Integral", category: "laticínios", quantity: 12, minQuantity: 15, supplier: "Fazenda Feliz", unit: "litro", notes: "Caixa com 12 unidades", lastUpdated: "2023-10-20" },
+            { id: 4, name: "Copos Descartáveis", category: "embalagens", quantity: 200, minQuantity: 100, supplier: "Embalagens Express", unit: "unidade", notes: "Copos de 200ml", lastUpdated: "2023-10-10" },
+            { id: 5, name: "Chá de Camomila", category: "bebidas", quantity: 5, minQuantity: 10, supplier: "Ervas Finas", unit: "pacote", notes: "Pacote com 20 sachês", lastUpdated: "2023-10-05" },
+            { id: 6, name: "Canela em Pó", category: "doces", quantity: 2, minQuantity: 5, supplier: "Tempero Bom", unit: "g", notes: "Pote de 100g", lastUpdated: "2023-10-12" },
+            { id: 7, name: "Xarope de Baunilha", category: "doces", quantity: 0, minQuantity: 3, supplier: "Sabores Especiais", unit: "ml", notes: "Frasco de 250ml", lastUpdated: "2023-10-22" },
+            { id: 8, name: "Água Mineral", category: "bebidas", quantity: 24, minQuantity: 12, supplier: "Água Pura", unit: "unidade", notes: "Garrafa de 500ml", lastUpdated: "2023-10-19" }
+        ];
+
+        // Estado da aplicação
+        let currentSection = 'dashboard';
+        let nextId = 9;
+
+        // Inicialização da aplicação
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar data atual
+            const currentDateElement = document.getElementById('current-date');
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            currentDateElement.textContent = now.toLocaleDateString('pt-BR', options);
+
+            // Inicializar navegação
+            initNavigation();
+            
+            // Carregar dados iniciais
+            updateDashboard();
+            renderInventoryTable();
+            renderRemoveItemsTable();
+            renderReportsTable();
+            
+            // Configurar eventos do formulário de adição
+            document.getElementById('add-item-form').addEventListener('submit', handleAddItem);
+            document.getElementById('cancel-add-btn').addEventListener('click', function() {
+                document.getElementById('add-item-form').reset();
+                switchSection('inventory');
+            });
+            
+            // Configurar eventos do modal de edição
+            document.getElementById('edit-item-form').addEventListener('submit', handleEditItem);
+            document.getElementById('close-edit-modal').addEventListener('click', closeEditModal);
+            document.getElementById('cancel-edit-btn').addEventListener('click', closeEditModal);
+            
+            // Configurar evento de busca na seção de remoção
+            document.getElementById('search-item').addEventListener('input', renderRemoveItemsTable);
+            
+            // Configurar botão para adicionar item
+            document.getElementById('add-item-btn').addEventListener('click', function() {
+                switchSection('add-item');
+            });
+            
+            // Configurar botão para gerar relatório
+            document.getElementById('generate-report-btn').addEventListener('click', generateReport);
+            
+            // Configurar eventos para mudança de tipo de relatório
+            document.getElementById('report-type').addEventListener('change', renderReportsTable);
+            document.getElementById('report-category').addEventListener('change', renderReportsTable);
+            
+            // Fechar modal ao clicar fora
+            document.getElementById('edit-item-modal').addEventListener('click', function(e) {
+                if (e.target === this) closeEditModal();
+            });
+        });
+
+        // Navegação entre seções
+        function initNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    switchSection(sectionId);
+                    
+                    // Atualizar estado ativo na navegação
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        }
+
+        function switchSection(sectionId) {
+            // Esconder todas as seções
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active-section');
+            });
+            
+            // Mostrar a seção selecionada
+            document.getElementById(sectionId).classList.add('active-section');
+            currentSection = sectionId;
+            
+            // Atualizar dados se necessário
+            if (sectionId === 'dashboard') {
+                updateDashboard();
+            } else if (sectionId === 'inventory') {
+                renderInventoryTable();
+            } else if (sectionId === 'remove-item') {
+                renderRemoveItemsTable();
+            } else if (sectionId === 'reports') {
+                renderReportsTable();
+            }
+        }
+
+        // Atualizar dashboard
+        function updateDashboard() {
+            const totalItems = inventory.length;
+            const inStockItems = inventory.filter(item => getItemStatus(item) === 'in-stock').length;
+            const lowStockItems = inventory.filter(item => getItemStatus(item) === 'low-stock').length;
+            const outOfStockItems = inventory.filter(item => getItemStatus(item) === 'out-of-stock').length;
+            
+            document.getElementById('total-items').textContent = totalItems;
+            document.getElementById('in-stock-items').textContent = inStockItems;
+            document.getElementById('low-stock-items').textContent = lowStockItems;
+            document.getElementById('out-of-stock-items').textContent = outOfStockItems;
+            
+            // Atualizar tabela de itens com estoque baixo
+            const lowStockTableBody = document.getElementById('low-stock-items-body');
+            lowStockTableBody.innerHTML = '';
+            
+            const lowStockItems = inventory.filter(item => getItemStatus(item) === 'low-stock' || getItemStatus(item) === 'out-of-stock');
+            
+            lowStockItems.forEach(item => {
+                const row = document.createElement('tr');
+                const status = getItemStatus(item);
+                const statusText = status === 'in-stock' ? 'Em Estoque' : 
+                                  status === 'low-stock' ? 'Estoque Baixo' : 'Sem Estoque';
+                const statusClass = status === 'in-stock' ? 'status-in-stock' : 
+                                   status === 'low-stock' ? 'status-low-stock' : 'status-out-of-stock';
+                
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${formatCategory(item.category)}</td>
+                    <td>${item.quantity} ${item.unit}</td>
+                    <td>${item.minQuantity} ${item.unit}</td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                `;
+                lowStockTableBody.appendChild(row);
+            });
+        }
+
+        // Renderizar tabela de inventário
+        function renderInventoryTable() {
+            const tableBody = document.getElementById('inventory-items-body');
+            tableBody.innerHTML = '';
+            
+            inventory.forEach(item => {
+                const status = getItemStatus(item);
+                const statusText = status === 'in-stock' ? 'Em Estoque' : 
+                                  status === 'low-stock' ? 'Estoque Baixo' : 'Sem Estoque';
+                const statusClass = status === 'in-stock' ? 'status-in-stock' : 
+                                   status === 'low-stock' ? 'status-low-stock' : 'status-out-of-stock';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${formatCategory(item.category)}</td>
+                    <td>${item.quantity} ${item.unit}</td>
+                    <td>${item.minQuantity} ${item.unit}</td>
+                    <td>${item.supplier || '-'}</td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn" style="background-color: var(--warning-color);" onclick="openEditModal(${item.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" style="background-color: var(--danger-color);" onclick="deleteItem(${item.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Renderizar tabela de remoção
+        function renderRemoveItemsTable() {
+            const searchTerm = document.getElementById('search-item').value.toLowerCase();
+            const tableBody = document.getElementById('remove-items-body');
+            tableBody.innerHTML = '';
+            
+            const filteredItems = inventory.filter(item => 
+                item.name.toLowerCase().includes(searchTerm) && 
+                item.quantity > 0
+            );
+            
+            filteredItems.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${formatCategory(item.category)}</td>
+                    <td>${item.quantity} ${item.unit}</td>
+                    <td>
+                        <input type="number" id="remove-qty-${item.id}" min="1" max="${item.quantity}" value="1" style="width: 100px; padding: 8px;">
+                    </td>
+                    <td>
+                        <button class="btn btn-danger" onclick="removeFromStock(${item.id})">
+                            <i class="fas fa-minus"></i> Retirar
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Renderizar tabela de relatórios
+        function renderReportsTable() {
+            const reportType = document.getElementById('report-type').value;
+            const reportCategory = document.getElementById('report-category').value;
+            const tableBody = document.getElementById('report-items-body');
+            tableBody.innerHTML = '';
+            
+            let filteredItems = [...inventory];
+            
+            // Filtrar por tipo
+            if (reportType === 'low') {
+                filteredItems = filteredItems.filter(item => getItemStatus(item) === 'low-stock');
+            } else if (reportType === 'out') {
+                filteredItems = filteredItems.filter(item => getItemStatus(item) === 'out-of-stock');
+            }
+            
+            // Filtrar por categoria
+            if (reportCategory !== 'all') {
+                filteredItems = filteredItems.filter(item => item.category === reportCategory);
+            }
+            
+            filteredItems.forEach(item => {
+                const status = getItemStatus(item);
+                const statusText = status === 'in-stock' ? 'Em Estoque' : 
+                                  status === 'low-stock' ? 'Estoque Baixo' : 'Sem Estoque';
+                const statusClass = status === 'in-stock' ? 'status-in-stock' : 
+                                   status === 'low-stock' ? 'status-low-stock' : 'status-out-of-stock';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${formatCategory(item.category)}</td>
+                    <td>${item.quantity} ${item.unit}</td>
+                    <td>${item.minQuantity} ${item.unit}</td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>${formatDate(item.lastUpdated)}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Manipular adição de item
+        function handleAddItem(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('item-name').value;
+            const category = document.getElementById('item-category').value;
+            const quantity = parseInt(document.getElementById('item-quantity').value);
+            const minQuantity = parseInt(document.getElementById('item-minimum').value);
+            const supplier = document.getElementById('item-supplier').value;
+            const unit = document.getElementById('item-unit').value;
+            const notes = document.getElementById('item-notes').value;
+            
+            const newItem = {
+                id: nextId++,
+                name,
+                category,
+                quantity,
+                minQuantity,
+                supplier,
+                unit,
+                notes,
+                lastUpdated: new Date().toISOString().split('T')[0]
+            };
+            
+            inventory.push(newItem);
+            
+            // Atualizar interface
+            updateDashboard();
+            renderInventoryTable();
+            renderRemoveItemsTable();
+            renderReportsTable();
+            
+            // Limpar formulário
+            document.getElementById('add-item-form').reset();
+            
+            // Mostrar mensagem de sucesso
+            alert(`Item "${name}" adicionado ao estoque com sucesso!`);
+            
+            // Mudar para a seção de inventário
+            switchSection('inventory');
+            
+            // Atualizar navegação
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            document.querySelector('[data-section="inventory"]').classList.add('active');
+        }
+
+        // Abrir modal para edição de item
+        function openEditModal(itemId) {
+            const item = inventory.find(item => item.id === itemId);
+            
+            if (!item) return;
+            
+            document.getElementById('edit-item-id').value = item.id;
+            document.getElementById('edit-item-name').value = item.name;
+            document.getElementById('edit-item-category').value = item.category;
+            document.getElementById('edit-item-quantity').value = item.quantity;
+            document.getElementById('edit-item-minimum').value = item.minQuantity;
+            
+            document.getElementById('edit-item-modal').classList.add('active');
+        }
+
+        // Fechar modal de edição
+        function closeEditModal() {
+            document.getElementById('edit-item-modal').classList.remove('active');
+            document.getElementById('edit-item-form').reset();
+        }
+
+        // Manipular edição de item
+        function handleEditItem(e) {
+            e.preventDefault();
+            
+            const id = parseInt(document.getElementById('edit-item-id').value);
+            const name = document.getElementById('edit-item-name').value;
+            const category = document.getElementById('edit-item-category').value;
+            const quantity = parseInt(document.getElementById('edit-item-quantity').value);
+            const minQuantity = parseInt(document.getElementById('edit-item-minimum').value);
+            
+            const itemIndex = inventory.findIndex(item => item.id === id);
+            
+            if (itemIndex !== -1) {
+                inventory[itemIndex].name = name;
+                inventory[itemIndex].category = category;
+                inventory[itemIndex].quantity = quantity;
+                inventory[itemIndex].minQuantity = minQuantity;
+                inventory[itemIndex].lastUpdated = new Date().toISOString().split('T')[0];
+                
+                // Atualizar interface
+                updateDashboard();
+                renderInventoryTable();
+                renderRemoveItemsTable();
+                renderReportsTable();
+                
+                // Fechar modal
+                closeEditModal();
+                
+                // Mostrar mensagem de sucesso
+                alert(`Item "${name}" atualizado com sucesso!`);
+            }
+        }
+
+        // Remover item do estoque
+        function removeFromStock(itemId) {
+            const qtyInput = document.getElementById(`remove-qty-${itemId}`);
+            const qtyToRemove = parseInt(qtyInput.value);
+            
+            if (isNaN(qtyToRemove) || qtyToRemove <= 0) {
+                alert('Por favor, insira uma quantidade válida para retirar.');
+                return;
+            }
+            
+            const itemIndex = inventory.findIndex(item => item.id === itemId);
+            
+            if (itemIndex !== -1) {
+                if (inventory[itemIndex].quantity < qtyToRemove) {
+                    alert(`Não há quantidade suficiente em estoque. Disponível: ${inventory[itemIndex].quantity}`);
+                    return;
+                }
+                
+                inventory[itemIndex].quantity -= qtyToRemove;
+                inventory[itemIndex].lastUpdated = new Date().toISOString().split('T')[0];
+                
+                // Atualizar interface
+                updateDashboard();
+                renderInventoryTable();
+                renderRemoveItemsTable();
+                renderReportsTable();
+                
+                // Mostrar mensagem de sucesso
+                alert(`${qtyToRemove} ${inventory[itemIndex].unit} de "${inventory[itemIndex].name}" retirados do estoque com sucesso!`);
+                
+                // Resetar o valor do input
+                qtyInput.value = 1;
+                qtyInput.max = inventory[itemIndex].quantity;
+            }
+        }
+
+        // Excluir item do inventário
+        function deleteItem(itemId) {
+            if (!confirm('Tem certeza que deseja excluir este item do inventário?')) {
+                return;
+            }
+            
+            const itemIndex = inventory.findIndex(item => item.id === itemId);
+            
+            if (itemIndex !== -1) {
+                const itemName = inventory[itemIndex].name;
+                inventory.splice(itemIndex, 1);
+                
+                // Atualizar interface
+                updateDashboard();
+                renderInventoryTable();
+                renderRemoveItemsTable();
+                renderReportsTable();
+                
+                // Mostrar mensagem de sucesso
+                alert(`Item "${itemName}" excluído do inventário com sucesso!`);
+            }
+        }
+
+        // Gerar relatório
+        function generateReport() {
+            const reportType = document.getElementById('report-type').value;
+            const reportCategory = document.getElementById('report-category').value;
+            
+            let reportTitle = '';
+            
+            if (reportType === 'all') {
+                reportTitle = 'Relatório Completo do Estoque';
+            } else if (reportType === 'low') {
+                reportTitle = 'Relatório de Itens com Estoque Baixo';
+            } else if (reportType === 'out') {
+                reportTitle = 'Relatório de Itens sem Estoque';
+            } else if (reportType === 'category') {
+                reportTitle = `Relatório de Estoque - Categoria: ${formatCategory(reportCategory)}`;
+            }
+            
+            // Criar conteúdo do relatório
+            let reportContent = `=== ${reportTitle} ===\n`;
+            reportContent += `Gerado em: ${new Date().toLocaleDateString('pt-BR')}\n\n`;
+            reportContent += 'ITEM | CATEGORIA | QUANTIDADE | MÍNIMO | STATUS\n';
+            reportContent += '------------------------------------------------\n';
+            
+            // Filtrar itens para o relatório
+            let filteredItems = [...inventory];
+            
+            if (reportType === 'low') {
+                filteredItems = filteredItems.filter(item => getItemStatus(item) === 'low-stock');
+            } else if (reportType === 'out') {
+                filteredItems = filteredItems.filter(item => getItemStatus(item) === 'out-of-stock');
+            }
+            
+            if (reportCategory !== 'all') {
+                filteredItems = filteredItems.filter(item => item.category === reportCategory);
+            }
+            
+            // Adicionar itens ao relatório
+            filteredItems.forEach(item => {
+                const status = getItemStatus(item);
+                const statusText = status === 'in-stock' ? 'Em Estoque' : 
+                                  status === 'low-stock' ? 'Estoque Baixo' : 'Sem Estoque';
+                
+                reportContent += `${item.name} | ${formatCategory(item.category)} | ${item.quantity} ${item.unit} | ${item.minQuantity} ${item.unit} | ${statusText}\n`;
+            });
+            
+            // Adicionar resumo
+            reportContent += '\n=== RESUMO ===\n';
+            reportContent += `Total de itens: ${filteredItems.length}\n`;
+            reportContent += `Itens em estoque: ${filteredItems.filter(item => getItemStatus(item) === 'in-stock').length}\n`;
+            reportContent += `Itens com estoque baixo: ${filteredItems.filter(item => getItemStatus(item) === 'low-stock').length}\n`;
+            reportContent += `Itens sem estoque: ${filteredItems.filter(item => getItemStatus(item) === 'out-of-stock').length}\n`;
+            
+            // Criar e baixar o arquivo
+            const blob = new Blob([reportContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `relatorio-estoque-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('Relatório gerado e baixado com sucesso!');
+        }
+
+        // Funções auxiliares
+        function getItemStatus(item) {
+            if (item.quantity <= 0) {
+                return 'out-of-stock';
+            } else if (item.quantity <= item.minQuantity) {
+                return 'low-stock';
+            } else {
+                return 'in-stock';
+            }
+        }
+
+        function formatCategory(category) {
+            const categories = {
+                'grãos': 'Grãos de Café',
+                'bebidas': 'Bebidas',
+                'laticínios': 'Laticínios',
+                'doces': 'Doces e Sobremesas',
+                'embalagens': 'Embalagens',
+                'outros': 'Outros'
+            };
+            
+            return categories[category] || category;
+        }
+
+        function formatDate(dateString) {
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            return new Date(dateString).toLocaleDateString('pt-BR', options);
+        }
+    </script>
+</body>
+</html>
